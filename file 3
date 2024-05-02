@@ -1,0 +1,18 @@
+import re
+
+# Example description
+description = "Example - Toronto - Fees"
+description2 = "Training - Montreal - Certification"
+
+# Assume keywords include 'Toronto', 'Montreal'
+test_keywords = ['Toronto', 'Montreal']
+
+# Regex pattern
+pattern = re.compile(r'\b(\w+)-\s*(' + '|'.join(re.escape(keyword) for keyword in test_keywords) + r')\s*-(\w+)\b', re.IGNORECASE)
+
+# Test the pattern
+match = pattern.search(description)
+match2 = pattern.search(description2)
+
+print("Match 1:", match.groups() if match else "No match")
+print("Match 2:", match2.groups() if match2 else "No match")
