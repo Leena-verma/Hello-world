@@ -32,3 +32,25 @@ def replace_tax_descriptions(group):
 grouped = transactions_df.groupby(['Date', 'Employee Name'])
 grouped.apply(replace_tax_descriptions)
 
+
+def replace_tax_descriptions(group):
+    print("Processing group:", group)  # Debug: print the group being processed
+    sorted_group = group.sort_values(by='Amount', ascending=False)
+    non_tax_rows = sorted_group[~sorted_group['Description'].str.contains('|'.join(tax_keywords), case=False, na=False)]
+    non_tax_descriptions = non_tax_rows['Description'].tolist()
+
+    if non_tax_descriptions:
+        tax_rows = sorted_group[sorted_group['Description'].str.contains('|'.join(tax_keywords), case=False, na=False)]
+        for idx, tax_row in tax_rows.iterrows():
+            transactions_df.at[idx, 'Updated Description'] = non_tax_descriptions.pop(0)
+            transactions_df.at[idx, 'Update Flag'] = 1
+    else:
+        tax_rows = sorted_group[sorted_group['Description'].str.contains('|'.join(tax_keywords), case=False, na=False)]
+        for idx, tax_row in tax_rows.iterrows():
+            transactions_df.at[idx, 'Updated Description'] = transactions_df.at[idx, 'Description']
+            transactions_df.at[idx, 'Update Flag'] = 0
+
+grouped = transactions_df.groupby(['Date', 'Employee Name'])
+grouped.apply(replace_tax_descriptions)
+
+
