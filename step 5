@@ -71,6 +71,36 @@ def extract_vendor_details(description, keywords):
 
 
 
+import re
+
+# Define keywords, including 'renewal' as you specified
+keywords = ['IIROC', 'CISSP', 'renewal', 'Canadian']  # Example keywords
+
+# Compile regex with case insensitivity, capturing only the keyword and the word following it
+pattern = re.compile(
+    r'\b(' + '|'.join(re.escape(keyword) for keyword in keywords) + r')\s+(\w+)', 
+    re.IGNORECASE  # This flag makes the search case-insensitive
+)
+
+# Test strings to demonstrate the functionality
+test_strings = [
+    "TAE0103 - IIROC licensing",
+    "COSBYM2 - CISSP membership dues",
+    "3NB renewal apps - new process",
+    "details about canadian standards"
+]
+
+# Use the regex pattern to search within each test string
+for test in test_strings:
+    match = pattern.search(test)
+    if match:
+        print("Match found:", match.groups())  # Outputs the keyword and the word immediately following it
+    else:
+        print("No match found for:", test)
+
+
+
+
 
 
 
