@@ -22,3 +22,29 @@ description2 = "Training event - Montreal - Certification"
 # Applying test
 print(extract_vendor_details(description, test_keywords))
 print(extract_vendor_details(description2, test_keywords))
+
+
+
+import re
+
+def extract_vendor_details(description, keywords):
+    if pd.isna(description):
+        return ""
+    description = str(description)
+
+    # Adjusted regex: Captures entire segment within hyphens containing the keyword
+    pattern = re.compile(r'-([^-\n]*(' + '|'.join(re.escape(keyword) for keyword in keywords) + r')[^-\n]*)-', re.IGNORECASE)
+
+    match = pattern.search(description)
+    if match:
+        return match.group(1).strip()  # Returns the matched group, stripping any excess whitespace
+    return ""
+
+# Example usage
+test_keywords = ['Toronto', 'Montreal']
+description = "This is a test - fee for Toronto something - more text"
+description2 = "Event details - certification in Montreal example - end part"
+
+# Applying test
+print(extract_vendor_details(description, test_keywords))
+print(extract_vendor_details(description2, test_keywords))
