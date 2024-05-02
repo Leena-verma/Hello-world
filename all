@@ -181,3 +181,52 @@ df['keyword'], df['keyword_and_context'] = zip(*df['description'].apply(lambda d
 
 # Output the DataFrame to see the result
 print(df)
+
+
+
+
+
+
+import pandas as pd
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk import pos_tag
+
+# Ensure you have the necessary NLTK resources downloaded
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+# Function to find the first matching keyword and the valid next or previous word in the description
+def assign_keyword_and_context(description, keywords):
+    tokens = word_tokenize(description)  # Tokenize the description
+    tagged_tokens = pos_tag(tokens)  # Tag tokens with part of speech
+    for i, (word, tag) in enumerate(tagged_tokens):
+        if word.lower() in keywords and tag.startswith('NN'):  # Check if the word is a noun keyword
+            # Check for next valid word
+            next_index = i + 1
+            while next_index < len(tagged_tokens) and (tagged_tokens[next_index][0] in ['-', ' '] or not tagged_tokens[next_index][0].isalpha()):
+                next_index += 1
+            next_word = tagged_tokens[next_index][0] if next_index < len(tagged_tokens) else None
+            
+            # Check for previous valid word
+            prev_index = i - 1
+            while prev_index >= 0 and (tagged_tokens[prev_index][0] in ['-', ' '] or not tagged_tokens[prev_index][0].isalpha()):
+                prev_index -= 1
+            prev_word = tagged_tokens[prev_index][0] if prev_index >= 0 else None
+            
+            if next_word:
+                return (word, word + " " + next_word)
+            elif prev_word:
+                return (word, prev_word + " " + word)
+            
+    return (None, None)  # Return None if no keyword is found
+
+# Assuming 'df' is your DataFrame and it has a column named 'description'
+# Extract common keywords from the 'description' column (assuming 'keywords' is already defined)
+# Function should be defined here if not already
+
+# Apply the function to find keywords and the context for each description
+df['keyword'], df['keyword_and_context'] = zip(*df['description'].apply(lambda desc: assign_keyword_and_context(desc, keywords)))
+
+# Output the DataFrame to see the result
+print(df)
