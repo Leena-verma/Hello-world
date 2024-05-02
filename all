@@ -1,0 +1,25 @@
+import pandas as pd
+import re
+
+# Load your DataFrame
+file_path = 'path_to_your_excel_file.xlsx'
+transactions_df = pd.read_excel(file_path)
+
+# Define function to extract keywords/phrases based on hyphen-delimited text
+def extract_keywords(description):
+    # Define your keywords which are expected to appear in phrases
+    keywords = ['training', 'certification', 'exam fee', 'scrum master']  # Extend this list as needed
+    pattern = re.compile(r'\b(' + '|'.join(keywords) + r')\b', re.IGNORECASE)
+
+    # Search for patterns that might include these keywords surrounded by hyphens
+    matches = re.findall(r'[^-]*-\s*(' + pattern.pattern + r')\s*-[^-]*', description)
+    
+    # Concatenate matches into a single string separated by semicolons
+    return '; '.join(matches)
+
+# Apply the function to the Updated Description column
+transactions_df['Vendor Details'] = transactions_df['Updated Description'].apply(extract_keywords)
+
+# Save the updated DataFrame
+output_path = 'updated_with_vendor_details.xlsx'
+transactions_df.to_excel(output_path, index=False)
