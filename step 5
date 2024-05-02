@@ -99,6 +99,28 @@ for test in test_strings:
         print("No match found for:", test)
 
 
+import re
+
+# Define the keywords
+keywords = ['IIROC', 'CISSP']
+
+# Compile the regex pattern, ensuring it's aimed to search for the keywords and any following text, up to a hyphen or the end of the line
+pattern = re.compile(r'-\s*([^-\n]*(' + '|'.join(re.escape(keyword) for keyword in keywords) + r')\s+[^-\n]*)')
+
+# Test strings that resemble your actual data
+test_strings = [
+    "TAE0103 - IIROC licensing",
+    "COSBYM2 - CISSP membership dues"
+]
+
+# Use the regex pattern to search within each test string
+for test in test_strings:
+    match = pattern.search(test)  # Use search(), not match()
+    if match:
+        print("Match found:", match.group(1))  # Outputs the entire content after the hyphen that contains the keyword
+    else:
+        print("No match found for:", test)
+
 
 
 
