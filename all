@@ -230,3 +230,37 @@ df['keyword'], df['keyword_and_context'] = zip(*df['description'].apply(lambda d
 
 # Output the DataFrame to see the result
 print(df)
+
+
+
+import pandas as pd
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk import pos_tag
+
+# Ensure NLTK resources are downloaded
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+# Create a condition and filter DataFrame
+condition = (df['column1'] == 1) & (df['column2'] == 1)
+filtered_df = df[condition].copy()
+
+# Apply keyword extraction to filtered data
+keywords = find_common_keywords(filtered_df['description'], top_n=50)
+
+# Apply keyword and context extraction to the filtered DataFrame
+filtered_df['keyword'], filtered_df['keyword_and_context'] = zip(*filtered_df['description'].apply(lambda desc: assign_keyword_and_context(desc, keywords)))
+
+# Prepare the filtered_df by resetting index to help with the merge
+filtered_df.reset_index(inplace=True)
+
+# Merge back to the original DataFrame
+result_df = pd.merge(df, filtered_df[['index', 'keyword', 'keyword_and_context']], on='index', how='left')
+
+# Clean up - remove the extra 'index' column
+result_df.drop(columns='index', inplace=True)
+
+# Display results
+print(result_df)
+
