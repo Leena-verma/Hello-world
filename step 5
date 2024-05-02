@@ -126,3 +126,62 @@ for test in test_strings:
 
 
 
+
+
+import pandas as pd
+import re
+from collections import Counter
+from nltk import pos_tag, word_tokenize
+from nltk.corpus import stopwords
+import nltk
+
+# Ensure necessary NLTK resources are downloaded
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('stopwords')
+
+def find_common_keywords(descriptions, top_n=50):
+    stopwords_set = set(stopwords.words('english'))
+    word_freq = Counter()
+    for description in descriptions.dropna():  # Ensure to drop NA values to avoid errors
+        tokens = word_tokenize(description.lower())
+        tagged = pos_tag(tokens)
+        nouns = [word for word, pos in tagged if pos.startswith('NN') and word not in stopwords_set and word.isalpha()]
+        word_freq.update(nouns)
+    return [word for word, freq in word_freq.most_common(top_n)]
+
+def extract_vendor_details(description, keywords):
+    if pd.isna(description):
+        return "NA", "NA"
+    pattern = re.compile(r'\b(' + '|'.join(re.escape(keyword) for keyword in keywords) + r')\s+(\w+)', re.IGNORECASE)
+    match = pattern.search(description)
+    if match:
+        return match.group(1), match.group(2)  # Keyword and the word after it
+    return "NA", "NA"
+
+# Assuming 'transactions_df' is your DataFrame and 'Updated Description' is the column of interest
+keywords = find_common_keywords(transactions_df['Updated Description'])
+print("Identified Keywords:", keywords)
+
+# Apply the extraction function and create two new columns
+transactions_df['Keyword'], transactions_df['Word After'] = zip(*transactions_df['Updated Description'].apply(
+    lambda desc: extract_vendor_details(desc, keywords)
+))
+
+# Optionally, combine the keyword and the word after into a single 'Updated Vendor' column
+transactions_df['Updated Vendor'] = transactions_df['Keyword'] + " " + transactions_df['Word After']
+
+# Review the results
+print(transactions_df[['Updated Description', 'Updated Vendor', 'Keyword']].head())
+
+# Save to Excel if needed
+transactions_df.to_excel('final_vendor_details.xlsx', index=False)
+
+
+
+
+
+
+
+
+
