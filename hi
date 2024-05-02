@@ -1,0 +1,25 @@
+def clean_and_count_words(descriptions):
+    # Regex to identify unwanted characters
+    unwanted_chars = re.compile('[^a-zA-Z\s]')
+    # Counter to keep track of word frequencies
+    word_freq = Counter()
+
+    for description in descriptions:
+        # Remove any unwanted characters
+        clean_description = re.sub(unwanted_chars, '', description)
+        # Tokenize the description into words
+        words = word_tokenize(clean_description)
+        # Update word frequencies
+        word_freq.update(word.lower() for word in words if word.isalpha())  # Ensure words are purely alphabetical
+
+    return word_freq
+
+# Apply the function to the Description column
+frequent_words = clean_and_count_words(transactions_df['Description'])
+
+# Optionally, filter to only keep words that appear more than a certain number of times
+min_frequency = 10  # You can adjust this threshold
+frequent_words = {word: count for word, count in frequent_words.items() if count > min_frequency}
+
+# Print the most common words
+print(frequent_words)
