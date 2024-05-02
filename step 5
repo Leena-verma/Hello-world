@@ -1,0 +1,24 @@
+import re
+
+# Expanded flexibility in regex to accommodate different formats
+def extract_vendor_details(description, keywords):
+    if pd.isna(description):
+        return "", ""
+    description = str(description)
+
+    # Adjusted regex: broader match criteria, more flexible with spaces and different delimiters
+    pattern = re.compile(r'(\b\w+\b)\s*[-—]\s*(' + '|'.join(re.escape(keyword) for keyword in keywords) + r')\s*[-—]\s*(\b\w+\b)', re.IGNORECASE)
+
+    match = pattern.search(description)
+    if match:
+        return match.group(1) + " " + match.group(2) + " " + match.group(3), match.group(2)
+    return "", ""
+
+# Test with a list of keywords and a sample description
+test_keywords = ['Toronto', 'Montreal']
+description = "This is a test - Toronto - Fee"
+description2 = "Training event - Montreal - Certification"
+
+# Applying test
+print(extract_vendor_details(description, test_keywords))
+print(extract_vendor_details(description2, test_keywords))
