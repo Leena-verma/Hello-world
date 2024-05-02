@@ -78,3 +78,62 @@ df['found_keyword'] = df['description'].apply(assign_keyword)
 # Output the DataFrame to see the result
 print(df)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import pandas as pd
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.probability import FreqDist
+from nltk import pos_tag
+
+# Ensure you have the necessary NLTK resources downloaded
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+
+# Function to preprocess text and extract common noun keywords
+def find_common_keywords(texts, top_n=50):
+    tokens = word_tokenize(' '.join(texts).lower())  # Tokenize and convert to lower case
+    filtered_tokens = [word for word in tokens if word.isalpha() and word not in stopwords.words('english')]
+    tagged_tokens = pos_tag(filtered_tokens)  # Tag tokens with part of speech
+    nouns = [word for word, tag in tagged_tokens if tag.startswith('NN')]  # Filter nouns
+    freq_dist = FreqDist(nouns)
+    common_keywords = [word for word, freq in freq_dist.most_common(top_n)]
+    return common_keywords
+
+# Assuming 'df' is your DataFrame and it has a column named 'description'
+# Extract common keywords from the 'description' column
+keywords = find_common_keywords(df['description'], top_n=50)
+
+# Function to find the first matching keyword and the word after it in the description
+def assign_keyword_and_next(description):
+    words = word_tokenize(description.lower())  # Tokenize and convert to lower case
+    tagged_words = pos_tag(words)  # Tag tokens with part of speech
+    for i, (word, tag) in enumerate(tagged_words):
+        if word in keywords and tag.startswith('NN'):
+            # If the noun keyword is found, check if there is another word after it
+            if i + 1 < len(tagged_words):
+                return word + " " + tagged_words[i + 1][0]  # Return the keyword and the next word
+            return word  # If there's no word after the keyword, return just the keyword
+    return None  # Return None if no keyword is found
+
+# Apply the function to find keywords and the word after for each description
+df['keyword_and_next'] = df['description'].apply(assign_keyword_and_next)
+
+# Output the DataFrame to see the result
+print(df)
