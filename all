@@ -23,3 +23,58 @@ transactions_df['Vendor Details'] = transactions_df['Updated Description'].apply
 # Save the updated DataFrame
 output_path = 'updated_with_vendor_details.xlsx'
 transactions_df.to_excel(output_path, index=False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import pandas as pd
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.probability import FreqDist
+from collections import Counter
+
+# Ensure you have the necessary NLTK resources downloaded
+nltk.download('punkt')
+nltk.download('stopwords')
+
+# Assuming 'df' is your DataFrame and it has a column named 'description'
+
+# Function to preprocess text and extract common keywords
+def find_common_keywords(texts, top_n=50):
+    words = word_tokenize(' '.join(texts).lower())  # Tokenize and convert to lower case
+    filtered_words = [word for word in words if word.isalpha() and word not in stopwords.words('english')]
+    freq_dist = FreqDist(filtered_words)
+    common_keywords = [word for word, freq in freq_dist.most_common(top_n)]
+    return common_keywords
+
+# Extract common keywords from the 'description' column
+keywords = find_common_keywords(df['description'], top_n=50)
+
+# Function to find the first matching keyword in the description
+def assign_keyword(description):
+    for keyword in keywords:
+        if keyword in description.lower():  # Check if keyword is in description
+            return keyword
+    return None  # Return None if no keyword is found
+
+# Apply the function to find keywords for each description
+df['found_keyword'] = df['description'].apply(assign_keyword)
+
+# Output the DataFrame to see the result
+print(df)
+
