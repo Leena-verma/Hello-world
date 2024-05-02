@@ -47,4 +47,30 @@ description2 = "Event details - certification in Montreal example - end part"
 
 # Applying test
 print(extract_vendor_details(description, test_keywords))
-print(extract_vendor_details(description2, test_keywords))
+print(extract_
+vendor_details(description2, test_keywords))
+
+
+
+def extract_vendor_details(description, keywords):
+    if pd.isna(description) or not description:
+        print("Returning empty for:", description)  # Debug print
+        return "", ""
+    description = str(description)
+
+    pattern = re.compile(r'-([^-\n]*(' + '|'.join(re.escape(keyword) for keyword in keywords) + r')[^-\n]*)-', re.IGNORECASE)
+    match = pattern.search(description)
+    if match:
+        result = (match.group(1).strip(), match.group(2).strip())
+        print("Match found:", result)  # Debug print
+        return result
+    else:
+        print("No match found, returning empty for:", description)  # Debug print
+        return "", ""
+
+
+
+
+
+
+
