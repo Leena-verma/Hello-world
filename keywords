@@ -1,0 +1,45 @@
+import pandas as pd
+import nltk
+from nltk import pos_tag
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from collections import Counter
+
+# Download necessary NLTK resources
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('stopwords')
+
+def find_potential_keywords(descriptions):
+    stopwords_set = set(stopwords.words('english'))
+    word_freq = Counter()
+
+    for description in descriptions:
+        # Tokenize and POS tag the words in the description
+        tokens = word_tokenize(description.lower())
+        tagged = pos_tag(tokens)
+
+        # Filter words: keep only nouns not in stopwords
+        nouns = [word for word, pos in tagged if pos.startswith('NN') and word not in stopwords_set]
+
+        # Update the counter with nouns
+        word_freq.update(nouns)
+
+    # Return the most common words as potential keywords
+    return word_freq.most_common(50)  # Adjust the number to get more or fewer suggestions
+# Assuming your DataFrame is already loaded as `transactions_df`
+common_keywords = find_potential_keywords(transactions_df['Updated Description'])
+
+# Print the most common keywords found
+print(common_keywords)
+
+
+# Assuming your DataFrame is already loaded as `transactions_df`
+common_keywords = find_potential_keywords(transactions_df['Updated Description'])
+
+# Print the most common keywords found
+print(common_keywords)
+
+
+
+
