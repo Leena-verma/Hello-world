@@ -1,0 +1,4 @@
+# Apply the function and split the results into two new columns
+transactions_df[['Updated Vendor', 'Trigger Keyword']] = transactions_df['Updated Description'].apply(
+    lambda desc: pd.Series(extract_vendor_details(desc, keywords))
+)
