@@ -1,0 +1,40 @@
+import pandas as pd
+import nltk
+from nltk import pos_tag
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from collections import Counter
+
+def find_common_keywords(descriptions, top_n=50):
+    stopwords_set = set(stopwords.words('english'))
+    word_freq = Counter()
+
+    for description in descriptions:
+        tokens = word_tokenize(str(description).lower())
+        tagged = pos_tag(tokens)
+        nouns = [word for word, pos in tagged if pos.startswith('NN') and word.isalpha() and word not in stopwords_set]
+        word_freq.update(nouns)
+
+    # Return the most common nouns as potential keywords
+    return [word for word, freq in word_freq.most_common(top_n)]
+
+keywords = find_common_keywords(transactions_df['Updated Description'])
+
+def extract_vendor_details(description, keywords):
+    pattern = re.compile(r'\b(\w+)-\s*(' + '|'.join(re.escape(keyword) for keyword in keywords) + r')\s*-(\w+)\b', re.IGNORECASE)
+    match = pattern.search(description)
+    if match:
+        return match.group(1) + " " + match.group(2) + " " + match.group(3), match.group(2)
+    return "", ""
+
+# Apply this function to create the new columns
+transactions_df[['Updated Vendor', 'Trigger Keyword']] = transactions_df['Updated Description'].apply(
+    lambda desc: pd.Series(extract_vendor_details(desc, keywords))
+)
+
+print(transactions_df[['Updated Description', 'Updated Vendor', 'Trigger Keyword']].head())
+transactions_df.to_excel('final_updated_with_vendor_details.xlsx', index=False)
+
+
+
+
