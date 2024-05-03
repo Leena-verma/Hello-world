@@ -334,3 +334,28 @@ data['Category'] = data['updated_Description'].apply(categorize_by_ngrams)
 
 print(data[['updated_Description', 'Category']].head())
 
+
+
+from nltk import ngrams
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from collections import Counter
+
+# Function to get n-grams
+def get_ngrams(text, n):
+    words = [word for word in word_tokenize(text.lower()) if word.isalpha() and word not in stopwords.words('english')]
+    return list(ngrams(words, n))
+
+# Applying the function to the dataset to extract bi-grams and tri-grams
+data['Bi-grams'] = data['updated_Description'].apply(lambda x: get_ngrams(x, 2))
+data['Tri-grams'] = data['updated_Description'].apply(lambda x: get_ngrams(x, 3))
+
+# Count the most common bi-grams and tri-grams
+bi_gram_counts = Counter([bg for bgs in data['Bi-grams'] for bg in bgs])
+tri_gram_counts = Counter([tg for tgs in data['Tri-grams'] for tg in tgs])
+
+print(bi_gram_counts.most_common(20))
+print(tri_gram_counts.most_common(20))
+
+
+
