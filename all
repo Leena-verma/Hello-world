@@ -297,3 +297,19 @@ freq_dist = nltk.FreqDist(filtered_tokens)
 # Print the 40 most common words
 print(freq_dist.most_common(40))
 
+
+
+
+def assign_keyword(description):
+    description_lower = description.lower()
+    for keyword, _ in sorted_keywords[:200]:  # Look only at the top 200 keywords
+        if keyword in description_lower:
+            return keyword
+    return None  # Returns None if no keywords are found
+
+# Apply this function to your DataFrame
+data['Keyword'] = data['updated_Description'].apply(assign_keyword)
+
+# Check the first few rows to see the result
+print(data[['updated_Description', 'Keyword']].head())
+
