@@ -264,3 +264,36 @@ result_df.drop(columns='index', inplace=True)
 # Display results
 print(result_df)
 
+
+
+
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
+# Download necessary NLTK resources
+nltk.download('punkt')
+nltk.download('stopwords')
+
+# Function to preprocess and tokenize text
+def tokenize(text):
+    tokens = word_tokenize(text)
+    words = [word.lower() for word in tokens if word.isalpha()]  # Remove punctuation and numbers
+    return words
+
+# Combine all descriptions into a single text
+all_descriptions = ' '.join(data['updated_Description'].fillna(''))
+
+# Tokenize the combined text
+tokens = tokenize(all_descriptions)
+
+# Remove stopwords
+stop_words = set(stopwords.words('english'))
+filtered_tokens = [word for word in tokens if word not in stop_words and len(word) > 2]
+
+# Calculate frequency distribution
+freq_dist = nltk.FreqDist(filtered_tokens)
+
+# Print the 40 most common words
+print(freq_dist.most_common(40))
+
