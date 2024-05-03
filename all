@@ -313,3 +313,24 @@ data['Keyword'] = data['updated_Description'].apply(assign_keyword)
 # Check the first few rows to see the result
 print(data[['updated_Description', 'Keyword']].head())
 
+
+
+# Define categories based on bi-grams and tri-grams
+def categorize_by_ngrams(description):
+    ngrams_list = get_ngrams(description, 2) + get_ngrams(description, 3)
+    categories = {
+        'Annual Fee': [('annual', 'fee')],
+        'Security Training': [('security', 'training')],
+        'Professional Membership': [('professional', 'membership')]
+        # Add more as needed
+    }
+    for category, ngrams in categories.items():
+        if any(ng in ngrams_list for ng in ngrams):
+            return category
+    return 'Other'
+
+# Apply to DataFrame
+data['Category'] = data['updated_Description'].apply(categorize_by_ngrams)
+
+print(data[['updated_Description', 'Category']].head())
+
